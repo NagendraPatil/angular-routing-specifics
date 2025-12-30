@@ -1,15 +1,29 @@
-import { Component } from '@angular/core';
-
-import { TaskComponent } from './task/task.component';
-import { Task } from './task/task.model';
+import { Component, computed, inject, input } from "@angular/core";
+import { TaskComponent } from "./task/task.component";
+import { TasksService } from "./tasks.service";
+import { RouterLink } from "@angular/router";
 
 @Component({
-  selector: 'app-tasks',
+  selector: "app-tasks",
   standalone: true,
-  templateUrl: './tasks.component.html',
-  styleUrl: './tasks.component.css',
-  imports: [TaskComponent],
+  templateUrl: "./tasks.component.html",
+  styleUrl: "./tasks.component.css",
+  imports: [TaskComponent, RouterLink],
 })
 export class TasksComponent {
-  userTasks: Task[] = [];
+  userId = input.required<string>();
+  order = input<"asc" | "desc">("asc"); // name of queryparam chose in template
+  tasksService = inject(TasksService);
+  userTasks = computed(() =>
+    this.tasksService
+      .allTasks()
+      .filter((task) => task.userId === this.userId())
+      .sort((a, b) => {
+        if (this.order() === "asc") {
+          return a.dueDate.localeCompare(b.dueDate);
+        } else {
+          return b.dueDate.localeCompare(a.dueDate);
+        }
+      })
+  );
 }
