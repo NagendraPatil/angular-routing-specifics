@@ -11,7 +11,6 @@ import {
   userNameResolver,
   UserTasksComponent,
 } from "./users/user-tasks/user-tasks.component";
-import { routes as userRoutes } from "./users/user.routes";
 import { NotFoundComponent } from "./not-found/not-found.component";
 import { inject } from "@angular/core";
 
@@ -35,7 +34,7 @@ export const routes: Routes = [
     path: "users/:userId",
     component: UserTasksComponent,
     canMatch: [canMatchGuard], // can be used to protect routes at matching level
-    children: userRoutes,
+    loadChildren: () => import("./users/user.routes").then((m) => m.routes), //lazy loads all childe routes
     data: { message: "hello!" }, // can be used to send static data to the selected route,
     resolve: {
       userName: userNameResolver,
